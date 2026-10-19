@@ -3,12 +3,12 @@ package ucu.edu.aed.tda.grafo;
 import ucu.edu.aed.tda.grafo.model.IGraph;
 import ucu.edu.aed.tda.grafo.model.edge.Edge;
 import ucu.edu.aed.tda.grafo.model.edge.WeightedEdge;
+import ucu.edu.aed.tda.grafo.model.result.DijkstraResult;
 import ucu.edu.aed.tda.grafo.model.result.IDijkstraResult;
-import ucu.edu.aed.tda.grafo.model.result.FloydResult;
+import ucu.edu.aed.tda.grafo.model.result.FloydWarshallResult;
 import ucu.edu.aed.tda.grafo.model.result.Path;
 import ucu.edu.aed.tda.grafo.model.result.ResultadoCaminoCritico;
 import ucu.edu.aed.tda.grafo.model.result.SecuenciaConHolgura;
-import ucu.edu.aed.tda.grafo.model.result.WarshallResult;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,6 +16,8 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.Queue;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -135,7 +137,7 @@ public class DirectedGraphAlgorithms implements IDirectedGraphAlgorithms {
      * Precondición: pesos no negativos.
      */
     @Override
-    public <V, D extends WeightedEdge> FloydResult<V> floyd(IDirectedIGraph<V, D> grafo) {
+    public <V, D extends WeightedEdge> FloydWarshallResult<V> floyd(IDirectedIGraph<V, D> grafo) {
         List<V> vertices = new ArrayList<>(grafo.vertices());
         Map<V, Integer> indice = new HashMap<>();
         for (int i = 0; i < vertices.size(); i++) indice.put(vertices.get(i), i);
@@ -165,7 +167,7 @@ public class DirectedGraphAlgorithms implements IDirectedGraphAlgorithms {
                 }
             }
         }
-        return new FloydResult<>(vertices, A, P);
+        return FloydWarshallResult.deFloyd(vertices, A, P);
     }
 
     /**
@@ -173,7 +175,7 @@ public class DirectedGraphAlgorithms implements IDirectedGraphAlgorithms {
      * En la iteración k, si todavía no hay camino de i a j pero hay de i a k y de k a j, ahora sí lo hay.
      */
     @Override
-    public <V, D extends WeightedEdge> WarshallResult<V> warshall(IDirectedIGraph<V, D> grafo) {
+    public <V, D extends WeightedEdge> FloydWarshallResult<V> warshall(IDirectedIGraph<V, D> grafo) {
         List<V> vertices = new ArrayList<>(grafo.vertices());
         Map<V, Integer> indice = new HashMap<>();
         for (int i = 0; i < vertices.size(); i++) indice.put(vertices.get(i), i);
@@ -199,7 +201,7 @@ public class DirectedGraphAlgorithms implements IDirectedGraphAlgorithms {
                 }
             }
         }
-        return new WarshallResult<>(vertices, A, P);
+        return FloydWarshallResult.deWarshall(vertices, A, P);
     }
 
     /**
@@ -216,7 +218,7 @@ public class DirectedGraphAlgorithms implements IDirectedGraphAlgorithms {
     /** Centro: el vértice de menor excentricidad. Devuelve null si el grafo está vacío. */
     @Override
     public <V, D extends WeightedEdge> V obtenerCentroGrafo(IDirectedIGraph<V, D> grafo) {
-        FloydResult<V> floyd = floyd(grafo);   // se calcula una sola vez para todos los vértices
+        FloydWarshallResult<V> floyd = floyd(grafo);   // se calcula una sola vez para todos los vértices
         V centro = null;
         double menor = Double.POSITIVE_INFINITY;
         for (V v : floyd.getVertices()) {
@@ -229,7 +231,7 @@ public class DirectedGraphAlgorithms implements IDirectedGraphAlgorithms {
         return centro;
     }
 
-    private <V> double excentricidad(FloydResult<V> floyd, V v) {
+    private <V> double excentricidad(FloydWarshallResult<V> floyd, V v) {
         double maximo = 0;
         for (V u : floyd.getVertices()) {
             if (!u.equals(v)) maximo = Math.max(maximo, floyd.getCost(u, v));
@@ -268,20 +270,116 @@ public class DirectedGraphAlgorithms implements IDirectedGraphAlgorithms {
         }
     }
 
-    // ---- Pendientes (otros ejercicios) ----
-
+    /**
+     * Dijkstra: costo mínimo desde source a todos los demás vértices, con vector de predecesores.
+     * Precondiciones: source existe en el grafo y los pesos son >= 0.
+     */
     @Override
     public <V, D extends WeightedEdge> IDijkstraResult<V> dijkstra(Comparable<V> source, IDirectedIGraph<V, D> grafo) {
-        throw new UnsupportedOperationException("pendiente");
+        V origen = grafo.buscarVertice(source);
+        if (origen == null) {
+            throw new IllegalArgumentException("El vértice origen no existe en el grafo");
+        }
+
+        Map<V, Double> costos = new HashMap<>();
+        Map<V, V> predecesores = new HashMap<>();
+        Set<V> definitivos = new HashSet<>();
+        for (V v : grafo.vertices()) costos.put(v, Double.POSITIVE_INFINITY);
+        costos.put(origen, 0.0);
+
+        // cola de (vértice, costo); las entradas desactualizadas se descartan al sacarlas
+        PriorityQueue<Map.Entry<V, Double>> cola = new PriorityQueue<>(Map.Entry.comparingByValue());
+        cola.add(Map.entry(origen, 0.0));
+
+        while (!cola.isEmpty()) {
+            V actual = cola.poll().getKey();
+            if (!definitivos.add(actual)) continue;
+
+            for (Edge<V, D> arco : grafo.adyacencias(grafo.construirComparable(actual))) {
+                double nuevoCosto = costos.get(actual) + arco.dato().getWeight();
+                if (nuevoCosto < costos.get(arco.target())) {
+                    costos.put(arco.target(), nuevoCosto);
+                    predecesores.put(arco.target(), actual);
+                    cola.add(Map.entry(arco.target(), nuevoCosto));
+                }
+            }
+        }
+        return new DijkstraResult<>(origen, costos, predecesores);
     }
 
+    /**
+     * Todos los caminos de source a target: BPF con backtracking. Se mantiene el camino actual y su costo;
+     * al llegar al destino se guarda una copia y se vuelve atrás. Al volver de un vértice se lo saca del
+     * camino y se lo desmarca, para poder usarlo en otros caminos. Ningún vértice se repite en un camino.
+     * Precondiciones: source y target existen en el grafo.
+     */
     @Override
     public <V, D extends WeightedEdge> List<Path<V>> obtenerTodosLosCaminos(Comparable<V> source, Comparable<V> target, IGraph<V, D> grafo) {
-        throw new UnsupportedOperationException("pendiente");
+        V origen = grafo.buscarVertice(source);
+        V destino = grafo.buscarVertice(target);
+        if (origen == null || destino == null) {
+            throw new IllegalArgumentException("El vértice origen o destino no existe en el grafo");
+        }
+
+        List<Path<V>> caminos = new ArrayList<>();
+        List<V> caminoActual = new ArrayList<>();
+        Set<V> visitados = new HashSet<>();
+        caminoActual.add(origen);
+        visitados.add(origen);
+        bpfTodosLosCaminos(grafo, origen, destino, caminoActual, 0, visitados, caminos);
+        return caminos;
     }
 
+    private <V, D extends WeightedEdge> void bpfTodosLosCaminos(IGraph<V, D> grafo, V actual, V destino, List<V> caminoActual,
+                                                                double costoActual, Set<V> visitados, List<Path<V>> caminos) {
+        if (actual.equals(destino)) {
+            caminos.add(new Path<>(new ArrayList<>(caminoActual), costoActual));
+            return;   // no se sigue explorando desde el destino
+        }
+        for (Edge<V, D> arco : grafo.adyacencias(grafo.construirComparable(actual))) {
+            V sucesor = arco.target();
+            if (!visitados.contains(sucesor)) {
+                visitados.add(sucesor);
+                caminoActual.add(sucesor);
+                bpfTodosLosCaminos(grafo, sucesor, destino, caminoActual, costoActual + arco.dato().getWeight(), visitados, caminos);
+                caminoActual.remove(caminoActual.size() - 1);   // backtracking
+                visitados.remove(sucesor);
+            }
+        }
+    }
+
+    /**
+     * BEA desde un vértice: visita solo lo alcanzable desde él, por niveles.
+     */
     @Override
     public <V, D> void recorridoEnAmplitud(IGraph<V, D> grafo, Comparable<V> sourceCriteria, Consumer<V> consumer) {
-        throw new UnsupportedOperationException("pendiente");
+        V origen = grafo.buscarVertice(sourceCriteria);
+        if (origen == null) return;
+        bea(grafo, origen, new HashSet<>(), consumer);
+    }
+
+    /**
+     * BEA de todo el grafo: igual que en profundidad, si quedan vértices sin visitar se arranca de nuevo
+     * desde el siguiente, con un solo conjunto de visitados para todo el recorrido.
+     */
+    @Override
+    public <V, D> void recorridoEnAmplitud(IGraph<V, D> grafo, Consumer<V> consumer) {
+        Set<V> visitados = new HashSet<>();
+        for (V v : grafo.vertices()) {
+            if (!visitados.contains(v)) bea(grafo, v, visitados, consumer);
+        }
+    }
+
+    private <V, D> void bea(IGraph<V, D> grafo, V origen, Set<V> visitados, Consumer<V> consumer) {
+        Queue<V> cola = new LinkedList<>();
+        visitados.add(origen);   // se marca al encolar, así ningún vértice entra dos veces a la cola
+        cola.add(origen);
+        while (!cola.isEmpty()) {
+            V actual = cola.poll();
+            consumer.accept(actual);
+            for (Edge<V, D> arco : grafo.adyacencias(grafo.construirComparable(actual))) {
+                if (visitados.add(arco.target())) cola.add(arco.target());
+            }
+        }
     }
 }

@@ -3,8 +3,12 @@ package ucu.edu.aed.tda.grafo;
 import ucu.edu.aed.tda.grafo.model.edge.DirectedEdge;
 import ucu.edu.aed.tda.grafo.model.edge.Edge;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -119,9 +123,47 @@ public class DirectedGraph<V, D> implements IDirectedIGraph<V, D> {
         adyacencias.clear();
     }
 
+    /**
+     * Conexo: existe un camino (respetando el sentido de los arcos) entre cualquier par de vértices,
+     * es decir, el grafo es fuertemente conexo. Alcanza con tomar un vértice v y comprobar que desde v
+     * se llega a todos (siguiendo los arcos) y que todos llegan a v (siguiendo los arcos invertidos):
+     * así, de u a w siempre se puede ir u -> v -> w. Un grafo vacío se considera conexo.
+     */
     @Override
     public boolean esConexo() {
-        throw new UnsupportedOperationException("pendiente");
+        if (adyacencias.isEmpty()) return true;
+
+        Map<V, List<V>> sucesores = new HashMap<>();
+        Map<V, List<V>> invertidos = new HashMap<>();
+        for (V v : adyacencias.keySet()) {
+            sucesores.put(v, new ArrayList<>());
+            invertidos.put(v, new ArrayList<>());
+        }
+        for (Map.Entry<V, List<Edge<V, D>>> entry : adyacencias.entrySet()) {
+            for (Edge<V, D> e : entry.getValue()) {
+                sucesores.get(entry.getKey()).add(e.target());
+                invertidos.get(e.target()).add(entry.getKey());
+            }
+        }
+
+        V inicio = adyacencias.keySet().iterator().next();
+        return alcanzables(inicio, sucesores) == adyacencias.size()
+                && alcanzables(inicio, invertidos) == adyacencias.size();
+    }
+
+    /** Cantidad de vértices alcanzables desde inicio (incluido), con una búsqueda en profundidad. */
+    private int alcanzables(V inicio, Map<V, List<V>> vecinos) {
+        Set<V> visitados = new HashSet<>();
+        Deque<V> pendientes = new ArrayDeque<>();
+        visitados.add(inicio);
+        pendientes.push(inicio);
+        while (!pendientes.isEmpty()) {
+            V actual = pendientes.pop();
+            for (V vecino : vecinos.get(actual)) {
+                if (visitados.add(vecino)) pendientes.push(vecino);
+            }
+        }
+        return visitados.size();
     }
 
     /**
@@ -130,8 +172,8 @@ public class DirectedGraph<V, D> implements IDirectedIGraph<V, D> {
      */
     @Override
     public boolean tieneCiclos() {
-        Set<V> visitados = new java.util.HashSet<>();
-        Set<V> enElCamino = new java.util.HashSet<>();
+        Set<V> visitados = new HashSet<>();
+        Set<V> enElCamino = new HashSet<>();
 
         for (V v : adyacencias.keySet()) {
             if (!visitados.contains(v) && bpfTieneCiclo(v, visitados, enElCamino)) return true;

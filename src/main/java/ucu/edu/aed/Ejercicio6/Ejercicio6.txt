@@ -159,8 +159,10 @@ Comienzo
 Fin
 
 Orden del tiempo de ejecución:
-Calcular el camino crítico es O(V + E): la clasificación topológica más una
-pasada por cada arista. Listar las secuencias puede ser exponencial, porque la
+Calcular el camino crítico es la clasificación topológica, O(V · (V + E)) (ver
+operación 3), más una pasada por cada vértice y cada arista. Esa pasada sería
+O(V + E), pero obtener las aristas salientes de un vértice cuesta O(V) porque
+hay que buscarlo, así que queda O(V² + E). Total: O(V · (V + E)). Listar las secuencias puede ser exponencial, porque la
 cantidad de caminos puede crecer muy rápido; no se puede evitar si hay que
 listarlas todas.
 
@@ -215,5 +217,9 @@ Comienzo
 Fin
 
 Orden del tiempo de ejecución:
-Una búsqueda en profundidad visita cada vértice y cada arista una sola vez,
-y tieneCiclos también es O(V + E). Total: O(V + E).
+Una búsqueda en profundidad visita cada vértice y cada arista una sola vez, y
+tieneCiclos es O(V + E). Pero esta búsqueda sigue los predecesores, y como cada
+vértice solo guarda sus aristas salientes, obtener los predecesores de un
+vértice obliga a recorrer todas las aristas del grafo: O(V + E) por vértice.
+Total: O(V · (V + E)). Si además se guardaran las aristas entrantes de cada
+vértice, sería O(V + E).

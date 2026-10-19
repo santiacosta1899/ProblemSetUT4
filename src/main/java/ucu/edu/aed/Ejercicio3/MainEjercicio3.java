@@ -3,8 +3,7 @@ package ucu.edu.aed.Ejercicio3;
 import ucu.edu.aed.tda.grafo.DirectedGraph;
 import ucu.edu.aed.tda.grafo.DirectedGraphAlgorithms;
 import ucu.edu.aed.tda.grafo.model.edge.WeightedEdge;
-import ucu.edu.aed.tda.grafo.model.result.FloydResult;
-import ucu.edu.aed.tda.grafo.model.result.WarshallResult;
+import ucu.edu.aed.tda.grafo.model.result.FloydWarshallResult;
 import ucu.edu.aed.utils.GrafoLoader;
 import ucu.edu.aed.utils.PrettyGrid;
 
@@ -22,8 +21,8 @@ public class MainEjercicio3 {
   System.out.println("Matriz de costos (VUELE SEGURO):");
   PrettyGrid.printGraphMatrix(grafo, v -> v);
 
-  FloydResult<String> floyd = algoritmos.floyd(grafo);
-  WarshallResult<String> warshall = algoritmos.warshall(grafo);
+  FloydWarshallResult<String> floyd = algoritmos.floyd(grafo);
+  FloydWarshallResult<String> warshall = algoritmos.warshall(grafo);
   List<String> nombres = floyd.getVertices();
 
   System.out.println("\nFloyd - matriz A (costos mínimos):");
@@ -43,7 +42,13 @@ public class MainEjercicio3 {
       System.out.println("3) Aeropuerto más apropiado para el centro de mantenimiento");
       System.out.println("0) Salir");
       System.out.print("Opción: ");
-      opcion = Integer.parseInt(sc.nextLine().trim());
+      try {
+        opcion = Integer.parseInt(sc.nextLine().trim());
+      } catch (NumberFormatException e) {
+        System.out.println("Opción inválida, ingrese un número del 0 al 3.");
+        opcion = -1;
+        continue;
+      }
 
       if (opcion == 1 || opcion == 2) {
         String origen = pedirCiudad(sc, grafo, "Ciudad origen: ");

@@ -105,4 +105,8 @@ Comienzo
 Fin
 
 Orden del tiempo de ejecución:
-Cada vértice se visita una vez y cada arista se mira una vez: O(V + E).
+Cada vértice se visita una vez y cada arista se mira una vez, lo que daría
+O(V + E). Pero en esta implementación, para obtener las adyacencias de un
+vértice primero hay que buscarlo con un Comparable, y eso cuesta O(V). Como se
+hace una vez por vértice, el total es O(V² + E). Con un acceso directo al
+vértice (buscarlo por clave en el mapa) sería O(V + E).

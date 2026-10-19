@@ -21,9 +21,9 @@ public class MainEjercicio4 {
 
     System.out.println("Lista de adyacencias:");
     for (String v : grafo.vertices()) {
-      System.out.println(v + " -> ");
+      System.out.print(v + " -> ");
       for (Edge<String, WeightedEdge> e : grafo.adyacencias(grafo.construirComparable(v))) {
-        System.out.println(e.target() + "(" + e.dato() + ")  ");
+        System.out.print(e.target() + "(" + e.dato() + ")  ");
       }
       System.out.println();
     }

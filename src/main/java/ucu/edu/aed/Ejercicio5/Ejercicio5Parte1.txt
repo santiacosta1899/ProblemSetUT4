@@ -119,10 +119,10 @@ M (0)
  7  M - PA                                           1000
  6  M - BA - PA                                      1450
 12  M - SP - PA                                      1960
- 5  M - BA - As - PA                                 2500
 14  M - SP - Sa - PA                                 2400
 15  M - Sa - PA                                      2400
 18  M - Sa - SP - PA                                 2400
+ 5  M - BA - As - PA                                 2500
 10  M - SP - As - PA                                 2880
 17  M - Sa - SP - As - PA                            3320
  8  M - SP - As - BA - PA                            5030

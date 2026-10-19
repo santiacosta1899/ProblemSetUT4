@@ -34,6 +34,34 @@ Florida	            ∞	                    No existe camino
 
 Parte 3
 
+3.2 Análisis de las interfaces
+
+IGraph<V, D> es la interfaz base de cualquier grafo, dirigido o no. V es el tipo de los vértices y D el dato que guarda cada arista
+(en este caso un WeightedEdge con la distancia). Define las operaciones comunes: agregar y remover vértices, agregar, eliminar y buscar
+aristas, obtener los vértices, las aristas y las adyacencias de un vértice, y consultar si el grafo es conexo o tiene ciclos.
+Los vértices se buscan con un Comparable<V> en lugar del vértice mismo, lo que permite buscar por un criterio (por ejemplo, el nombre
+del aeropuerto sin importar mayúsculas). El método por defecto construirComparable arma ese criterio usando equals.
+También trae métodos por defecto que se resuelven con los demás (agregarVertices, existeVertice, cantidadDeVertices, cantidadDeAristas),
+así cada implementación solo tiene que programar las operaciones básicas.
+
+IDirectedIGraph<V, D> extiende IGraph y agrega lo propio de un grafo dirigido, donde importa el sentido de las aristas:
+successors (los vértices a los que se llega por aristas salientes) y predecessors (los vértices que tienen una arista hacia v).
+A partir de ellos define por defecto gradoDeSalida y gradoDeEntrada. IUndirectedGraph cumple el mismo papel para los grafos no
+dirigidos, aunque no agrega operaciones porque ahí no hay sentido en las aristas.
+
+IDirectedGraphAlgorithms separa los algoritmos de la estructura: el grafo solo guarda vértices y aristas, y los algoritmos lo reciben
+por parámetro. Así se pueden aplicar a cualquier implementación de grafo. Define Dijkstra (caminos mínimos desde un origen), Floyd
+(caminos mínimos entre todos los pares), Warshall (cerradura transitiva), la excentricidad y el centro del grafo, todos los caminos
+entre dos vértices, los recorridos en profundidad y en amplitud y la clasificación topológica. Los que necesitan pesos exigen
+D extends WeightedEdge. Los resultados se devuelven como interfaces (IDijkstraResult, IFloydWarshallResult, Path), que permiten
+consultar el costo y recuperar el camino sin conocer cómo se guardaron internamente.
+
+IUndirectedGraphAlgorithm agrupa los algoritmos de los grafos no dirigidos: Prim y Kruskal (árbol abarcador de costo mínimo),
+searchMinEdge (la arista mínima entre dos conjuntos de vértices, auxiliar para Prim) y la búsqueda en amplitud. Se mantiene separada
+de la de grafos dirigidos porque esos algoritmos solo tienen sentido sobre grafos no dirigidos.
+
+3.3 Estructuras de datos utilizadas
+
 Se utiliza un LinkedHashMap para almacenar cada vértice junto con su lista de aristas salientes. 
 Para guardar las aristas se utiliza ArrayList, mientras que para los conjuntos de vértices se utilizan LinkedHashSet y HashSet.
 La implementación mediante listas de adyacencias consume O(V + E) de memoria, donde V es la cantidad de vértices y E la cantidad de aristas. 
