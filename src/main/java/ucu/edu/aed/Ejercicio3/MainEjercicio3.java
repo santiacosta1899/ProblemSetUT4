@@ -59,7 +59,7 @@ public class MainEjercicio3 {
         }
       } else if (opcion == 3) {
         for (String v : nombres) {
-          System.out.println("Excentricidad de " + v + ": " + algoritmos.obtenerExcentricidad(grafo, grafo.construirComparabl(v)));
+          System.out.println("Excentricidad de " + v + ": " + algoritmos.obtenerExcentricidad(grafo, grafo.construirComparable(v)));
         }
         System.out.println("Aeropuerto más apropiado (centro del grafo): " + algoritmos.obtenerCentroGrafo(grafo));
       }
