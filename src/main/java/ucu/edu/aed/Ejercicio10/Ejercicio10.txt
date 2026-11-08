@@ -1,0 +1,53 @@
+EJERCICIO 10
+
+Búsqueda en amplitud 
+
+Lenguaje natural:
+Se recorre el grafo por niveles. Se guarda un conjunto de visitados y una cola. Se
+empieza marcando el vértice inicial y mientras la cola no esté vacía, se
+saca un vértice, se lo visita, y se miran sus adyacentes. Los que todavía no están
+marcados se marcan y se encolan. Se marca al encolar para evitar que un mismo
+vértice entre dos veces a la cola cuando se llega a él por dos caminos o por un ciclo.
+
+PRECONDICIONES:
+- El grafo y la operación que se aplica a cada vértice no son nulos.
+- El grafo puede tener ciclos, y por eso hace falta el conjunto de visitados.
+
+Postcondiciones:
+- El grafo no cambia.
+- Cada vértice se visita exactamente una vez.
+- Los vértices se visitan por niveles.
+
+Pseudocódigo:
+
+bea(grafo, visitar)
+Comienzo
+    visitados <- conjunto vacío
+    PARA CADA inicio EN vertices(grafo) HACER
+        SI inicio NO ESTA EN visitados ENTONCES
+            beaDesde(inicio)
+        FIN SI
+    FIN PARA
+Fin
+
+beaDesde(inicio)
+Comienzo
+    cola <- cola vacía
+    visitados.agregar(inicio)
+    cola.encolar(inicio)
+    MIENTRAS cola NO ESTA VACIA HACER
+        actual <- cola.desencolar()
+        visitar(actual)
+        PARA CADA vecino EN adyacentes(actual) HACER
+            SI vecino NO ESTA EN visitados ENTONCES
+                visitados.agregar(vecino)
+                cola.encolar(vecino)
+            FIN SI
+        FIN PARA
+    FIN MIENTRAS
+Fin
+
+Orden del tiempo de ejecución:
+Cada vértice entra una sola vez a la cola y se saca una vez. Cada arista se mira dos
+veces (una desde cada extremo). Total: O(V + E). Con matriz de adyacencias sería O(V^2).
+

@@ -27,7 +27,7 @@ public class PuntosDeArticulacionTest extends TestCase {
     }
 
     private Set<String> puntos() {
-        return algoritmos.puntosDeArticulacion(grafo);
+        return new HashSet<>(algoritmos.puntosDeArticulacion(grafo));
     }
 
     /**
@@ -157,7 +157,7 @@ public class PuntosDeArticulacionTest extends TestCase {
             for (String v : g.vertices()) {
                 if (componentes(sinVertice(g, v)) > componentes) esperados.add(v);
             }
-            assertEquals("prueba " + prueba + ": " + g.aristas(), esperados, algoritmos.puntosDeArticulacion(g));
+            assertEquals("prueba " + prueba + ": " + g.aristas(), esperados, new HashSet<>(algoritmos.puntosDeArticulacion(g)));
         }
     }
 

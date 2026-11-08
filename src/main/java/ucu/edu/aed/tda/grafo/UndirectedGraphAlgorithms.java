@@ -1,5 +1,6 @@
 package ucu.edu.aed.tda.grafo;
 
+import ucu.edu.aed.tda.grafo.model.IGraph;
 import ucu.edu.aed.tda.grafo.model.edge.Edge;
 import ucu.edu.aed.tda.grafo.model.edge.WeightedEdge;
 
@@ -140,8 +141,10 @@ public class UndirectedGraphAlgorithms implements IUndirectedGraphAlgorithm {
      * - la raíz es punto de articulación si y solo si tiene dos o más hijos;
      * - otro vértice v lo es si y solo si tiene un hijo w con bajo[w] >= numBp[v].
      * Si el grafo no es conexo se hace una búsqueda desde cada componente.
+     * Firma pedida en el ejercicio 11: devuelve los puntos de articulación, sin repetidos, en el orden en que
+     * se descubren. Precondición: el grafo es no dirigido (cada arista figura en la lista de sus dos extremos).
      */
-    public <V, D> Set<V> puntosDeArticulacion(IUndirectedGraph<V, D> graph) {
+    public <V, E> List<V> puntosDeArticulacion(IGraph<V, E> graph) {
         Map<V, Integer> numBp = new HashMap<>();
         Map<V, Integer> bajo = new HashMap<>();
         Set<V> puntos = new LinkedHashSet<>();
@@ -152,7 +155,7 @@ public class UndirectedGraphAlgorithms implements IUndirectedGraphAlgorithm {
             bajo.put(raiz, numBp.get(raiz));
 
             int hijosDeLaRaiz = 0;
-            for (Edge<V, D> arista : graph.adyacencias(graph.construirComparable(raiz))) {
+            for (Edge<V, E> arista : graph.adyacencias(graph.construirComparable(raiz))) {
                 if (!numBp.containsKey(arista.target())) {
                     hijosDeLaRaiz++;
                     bpfArticulacion(graph, arista.target(), raiz, numBp, bajo, puntos);
@@ -160,10 +163,10 @@ public class UndirectedGraphAlgorithms implements IUndirectedGraphAlgorithm {
             }
             if (hijosDeLaRaiz >= 2) puntos.add(raiz);
         }
-        return puntos;
+        return new ArrayList<>(puntos);
     }
 
-    private <V, D> void bpfArticulacion(IUndirectedGraph<V, D> graph, V actual, V padre,
+    private <V, D> void bpfArticulacion(IGraph<V, D> graph, V actual, V padre,
                                         Map<V, Integer> numBp, Map<V, Integer> bajo, Set<V> puntos) {
         numBp.put(actual, numBp.size() + 1);   // numeración en orden previo, empieza en 1
         bajo.put(actual, numBp.get(actual));

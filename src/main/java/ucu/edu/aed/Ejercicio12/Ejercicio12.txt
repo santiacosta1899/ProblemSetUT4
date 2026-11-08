@@ -1,0 +1,54 @@
+EJERCICIO 12 
+
+Número de Bacon
+
+Lenguaje natural:
+Se hace una búsqueda en amplitud empezando en Kevin_Bacon, que está en el nivel 0. Los compañeros de
+película de un actor del nivel n quedan en el nivel n + 1. El nivel en que se encuentra a un actor es su
+número de Bacon. Se guarda el nivel de cada actor en un diccionario, que también sirve para no visitar dos
+veces al mismo actor. Si la cola se vacía sin encontrar al actor, no hay ninguna cadena de películas hasta
+Kevin_Bacon y se devuelve -1.
+
+Precondiciones:
+- El grafo no es nulo y contiene el vértice "Kevin_Bacon".
+- El actor no es nulo.
+
+Postcondiciones:
+- El grafo no cambia.
+- Devuelve 0 para Kevin_Bacon, el largo mínimo de la cadena de películas para un actor conectado, y
+  -1 si el actor no está en el grafo o no tiene ninguna cadena hasta Kevin_Bacon.
+
+Pseudocódigo:
+
+numBacon(grafo, actor) devuelve entero
+Comienzo
+    SI grafo ES NULO OR actor ES NULO ENTONCES
+        error "el grafo y el actor no pueden ser nulos"
+    FIN SI
+    SI NO existeVertice(grafo, "Kevin_Bacon") ENTONCES
+        error "el grafo no contiene a Kevin_Bacon"
+    FIN SI
+    SI NO existeVertice(grafo, actor) ENTONCES
+        devolver -1
+    FIN SI
+
+    nivel <- diccionario vacío             // actor -> número de Bacon (también marca los visitados)
+    cola <- cola vacía
+    nivel["Kevin_Bacon"] <- 0
+    cola.encolar("Kevin_Bacon")
+
+    MIENTRAS cola NO ESTA VACIA HACER
+        actual <- cola.desencolar()
+        SI actual = actor ENTONCES
+            devolver nivel[actual]
+        FIN SI
+        PARA CADA pelicula EN adyacencias(grafo, actual) HACER
+            companiero <- pelicula.destino
+            SI companiero NO ESTA EN nivel ENTONCES
+                nivel[companiero] <- nivel[actual] + 1
+                cola.encolar(companiero)
+            FIN SI
+        FIN PARA
+    FIN MIENTRAS
+    devolver -1
+Fin

@@ -1,0 +1,7 @@
+Actores: 61, películas (aristas): 81, relaciones descartadas: 2
+Número de Bacon:
+John_Goodman: 4
+Tom_Cruise: 4
+Jason_Statham: 4
+Lukas_Haas: 5
+Djimon_Hounsou: 6
