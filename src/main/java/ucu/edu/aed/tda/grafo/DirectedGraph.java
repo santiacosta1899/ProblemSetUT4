@@ -5,7 +5,6 @@ import ucu.edu.aed.tda.grafo.model.edge.Edge;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -18,6 +17,8 @@ import java.util.Set;
 /**
  * Implementación mínima de grafo dirigido con lista de adyacencias:
  * cada vértice apunta a la lista de sus aristas salientes.
+ * Se permiten lazos (A -> A): en un dirigido son un ciclo de largo 1. No se permite más de un arco
+ * con el mismo origen y destino.
  */
 public class DirectedGraph<V, D> implements IDirectedIGraph<V, D> {
 
@@ -66,14 +67,14 @@ public class DirectedGraph<V, D> implements IDirectedIGraph<V, D> {
 
     @Override
     public Set<V> vertices() {
-        return Collections.unmodifiableSet(adyacencias.keySet());
+        return adyacencias.keySet();
     }
 
     @Override
     public Set<Edge<V, D>> aristas() {
         Set<Edge<V, D>> todas = new LinkedHashSet<>();
         adyacencias.values().forEach(todas::addAll);
-        return Collections.unmodifiableSet(todas);
+        return todas;
     }
 
     @Override
@@ -94,8 +95,8 @@ public class DirectedGraph<V, D> implements IDirectedIGraph<V, D> {
     @Override
     public List<Edge<V, D>> adyacencias(Comparable<V> verticeCriteria) {
         V v = buscarVertice(verticeCriteria);
-        if (v == null) return Collections.emptyList();
-        return Collections.unmodifiableList(adyacencias.get(v));
+        if (v == null) return new ArrayList<>();
+        return adyacencias.get(v);
     }
 
     @Override

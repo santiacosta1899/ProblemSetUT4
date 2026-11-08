@@ -1,0 +1,91 @@
+EJERCICIO 9 - Árbol abarcador de costo mínimo con Kruskal
+
+Grafo: ver ej9_grafo.png. Árbol resultante: ver ej9_arbol.png.
+Verificación en código: MainEjercicio9 (Kruskal paso a paso y el kruskal de
+UndirectedGraphAlgorithms) y Ejercicio9Test.
+
+Es un grafo no dirigido y ponderado: cada zona es un vértice y cada camino
+posible una arista con los km como peso. Es no dirigido porque un camino de
+tierra se recorre en los dos sentidos y cuesta lo mismo (la tabla es
+simétrica). Como hay distancia entre todo par de zonas, es completo:
+6 vértices y 15 aristas.
+
+
+------------------------------------------------------------
+1. REPRESENTACIÓN GRÁFICA
+------------------------------------------------------------
+
+Ver ej9_grafo.png.
+
+Lista de adyacencias:
+
+    Zona 1 -> Zona 2(3), Zona 3(5), Zona 4(1), Zona 5(7), Zona 6(2)
+    Zona 2 -> Zona 1(3), Zona 3(1), Zona 4(3), Zona 5(5), Zona 6(6)
+    Zona 3 -> Zona 1(5), Zona 2(1), Zona 4(2), Zona 5(3), Zona 6(5)
+    Zona 4 -> Zona 1(1), Zona 2(3), Zona 3(2), Zona 5(7), Zona 6(1)
+    Zona 5 -> Zona 1(7), Zona 2(5), Zona 3(3), Zona 4(7), Zona 6(4)
+    Zona 6 -> Zona 1(2), Zona 2(6), Zona 3(5), Zona 4(1), Zona 5(4)
+
+
+------------------------------------------------------------
+2. KRUSKAL PASO A PASO
+------------------------------------------------------------
+
+Lenguaje natural:
+Al principio cada zona es una componente por separado. Se ordenan las
+aristas de menor a mayor costo y se miran en ese orden: si los dos extremos
+están en componentes distintas, la arista se agrega y las dos componentes se
+unen en una; si están en la misma, se descarta porque cerraría un ciclo.
+Termina al tener n - 1 = 5 aristas.
+
+Aristas ordenadas por costo (los empates, en el orden de la tabla):
+
+     1. (1,4) 1      6. (1,2) 3     11. (2,5) 5
+     2. (2,3) 1      7. (2,4) 3     12. (3,6) 5
+     3. (4,6) 1      8. (3,5) 3     13. (2,6) 6
+     4. (1,6) 2      9. (5,6) 4     14. (1,5) 7
+     5. (3,4) 2     10. (1,3) 5     15. (4,5) 7
+
+Componentes al empezar: {1} {2} {3} {4} {5} {6}
+
+Paso 1: (1,4) 1   1 y 4 en componentes distintas -> SE AGREGA
+        componentes: {1, 4} {2} {3} {5} {6}               costo acumulado 1
+Paso 2: (2,3) 1   distintas                      -> SE AGREGA
+        componentes: {1, 4} {2, 3} {5} {6}                costo acumulado 2
+Paso 3: (4,6) 1   distintas                      -> SE AGREGA
+        componentes: {1, 4, 6} {2, 3} {5}                 costo acumulado 3
+Paso 4: (1,6) 2   1 y 6 ya están en {1, 4, 6}     -> SE DESCARTA (ciclo 1-4-6)
+Paso 5: (3,4) 2   distintas                      -> SE AGREGA
+        componentes: {1, 2, 3, 4, 6} {5}                  costo acumulado 5
+Paso 6: (1,2) 3   misma componente               -> SE DESCARTA (ciclo 1-4-3-2)
+Paso 7: (2,4) 3   misma componente               -> SE DESCARTA (ciclo 2-3-4)
+Paso 8: (3,5) 3   distintas                      -> SE AGREGA
+        componentes: {1, 2, 3, 4, 5, 6}                   costo acumulado 8
+
+Ya hay 5 aristas (n - 1): termina. Las aristas 9 a 15 no se miran.
+
+
+------------------------------------------------------------
+3. RESULTADO
+------------------------------------------------------------
+
+Ver ej9_arbol.png.
+
+    Camino               km
+    Zona 1 - Zona 4       1
+    Zona 2 - Zona 3       1
+    Zona 4 - Zona 6       1
+    Zona 3 - Zona 4       2
+    Zona 3 - Zona 5       3
+    Total                 8
+
+La mejor opción es construir esos 5 caminos, con 8 km en total.
+
+
+Orden del tiempo de ejecución (implementación de UndirectedGraphAlgorithms):
+- Ordenar las aristas: O(E log E).
+- Cada arista se mira una vez y comparar componentes es O(1) con el mapa.
+- Unir dos componentes recorre el mapa de componentes: O(V), y se une V - 1
+  veces: O(V²).
+- Total: O(E log E + V²). Con conjuntos disjuntos (unión por rango y
+  compresión de caminos) unir y buscar es casi O(1) y queda O(E log E).

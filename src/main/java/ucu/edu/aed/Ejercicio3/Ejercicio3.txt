@@ -24,8 +24,9 @@ Por qué cada estructura:
   TreeMap obligaría a que V sea Comparable y cuesta O(log V).
 - ArrayList para las adyacencias: agregar al final es O(1) y recorrerla es
   O(grado). Ocupa menos memoria que una LinkedList.
-- Set para vertices(), sucesores y predecesores: no hay repetidos, y se
-  devuelven vistas inmodificables para no romper la estructura desde afuera.
+- Set para vertices(), sucesores y predecesores: no hay repetidos.
+  vertices() devuelve el conjunto de claves del mapa, sin copiarlo (O(1));
+  sucesores y predecesores arman un conjunto nuevo en cada llamada.
 - Lista de adyacencias y no matriz: ocupa O(V + E) en vez de O(V²). La red
   es dispersa (24 vuelos de 56 posibles). Floyd y Warshall arman su propia
   matriz al empezar, que es donde la matriz conviene.
