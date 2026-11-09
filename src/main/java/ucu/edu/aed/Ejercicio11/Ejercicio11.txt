@@ -81,3 +81,21 @@ Fin
 
 Orden del tiempo de ejecución:
 Cada vértice se visita una vez y cada arista se mira dos veces (una por extremo). Total O(V + E).
+
+PASO A PASO
+
+1. Nairobi: numBp = 1, bajo = 1.
+2. Cairo (hijo de Nairobi): numBp = 2, bajo = 2. No tiene retroceso. Como bajo[Cairo] = 2 ≥ numBp[Nairobi] = 1, se anota.
+3. Monrovia (hijo de Nairobi): numBp = 3, bajo = 3.
+4. Garoua (hijo de Monrovia): numBp = 4. Su arista a Nairobi es de retroceso, así que bajo[Garoua] = min(4, 1) = 1.
+5. Mekele (hijo de Garoua): numBp = 5. Su arista a Monrovia es de retroceso, así que bajo[Mekele] = min(5, 3) = 3.
+6. Praia (hijo de Mekele): numBp = 6, bajo = 6. Como bajo[Praia] = 6 ≥ numBp[Mekele] = 5, Mekele es punto de articulación.
+7. Se vuelve a Garoua: bajo = 1. Como bajo[Mekele] = 3 < numBp[Garoua] = 4, Garoua no es punto.
+8. Se vuelve a Monrovia: bajo = 1. Como bajo[Garoua] = 1 < numBp[Monrovia] = 3, Monrovia no es punto.
+9. En la raíz Nairobi, sus hijos en el árbol son Cairo y Monrovia (Garoua ya estaba visitada). Tiene 2 hijos, así que Nairobi es punto de articulación.
+
+RESPUESTA
+
+Si falta la energía o las comunicaciones en Nairobi, Cairo queda aislada del resto. Si falta en Mekele,
+Praia queda aislada. Las demás ciudades pueden fallar sin partir la red. Por ejemplo, sin Monrovia sigue
+habiendo camino Nairobi-Garoua-Mekele.

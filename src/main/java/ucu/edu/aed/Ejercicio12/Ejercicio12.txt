@@ -52,3 +52,47 @@ Comienzo
     FIN MIENTRAS
     devolver -1
 Fin
+
+RESULTADOS
+
+Se cargaron 61 actores y 81 aristas. De las 83 relaciones del archivo, 2 repetían un par de actores que ya
+estaba escrito al revés, así que se descartaron.
+
+Número de Bacon:
+  John_Goodman:   4
+  Tom_Cruise:     4
+  Jason_Statham:  4
+  Lukas_Haas:     5
+  Djimon_Hounsou: 6
+
+CASOS DE PRUEBA
+
+Cada caso indica la entrada y lo que se espera.
+
+ 1. Kevin_Bacon: su número de Bacon es 0.
+ 2. Ejemplo del enunciado: Tom_Hanks trabajó con Kevin_Bacon (Apolo_13) y Sally_Field con Tom_Hanks
+    (Forrest_Gump): Tom_Hanks tiene 1 y Sally_Field tiene 2.
+ 3. Cadena larga Kevin_Bacon - A - B - C - D: D tiene 4.
+ 4. Dos cadenas hacia D, Kevin_Bacon - A - D (2 películas) y Kevin_Bacon - B - C - D (3 películas): D tiene 2,
+    la más corta.
+ 5. Ciclo entre actores (A, B y C) con A unido a Kevin_Bacon: C tiene 2 y la búsqueda termina.
+ 6. Actor sin ninguna cadena de películas hasta Kevin_Bacon: se devuelve -1.
+ 7. Actor que no está en el grafo: se devuelve -1.
+ 8. Grafo sin Kevin_Bacon: error.
+ 9. Grafo o actor nulo: error.
+10. El grafo no cambia después de consultar: tiene los mismos vértices y aristas.
+11. Carga de archivos válidos con una línea vacía al final: la cantidad de actores y de relaciones es la correcta.
+12. Carga con un encabezado en la primera línea y con punto y coma como separador: el encabezado se ignora.
+13. Carga con una relación que nombra un actor desconocido o que tiene columnas de menos: se descarta y se
+    cuenta como descartada.
+14. Archivos del ejercicio: 61 actores, 81 aristas y 2 relaciones descartadas. Los números de Bacon son los de
+    la sección RESULTADOS.
+
+Pseudocódigo de uno de los casos (caso 4):
+
+pruebaCaminoMasCorto()
+Comienzo
+    grafo <- nuevo grafo no dirigido con los vértices Kevin_Bacon, A, B, C, D
+    agregar aristas (Kevin_Bacon, B), (B, C), (C, D), (Kevin_Bacon, A), (A, D)
+    verificar numBacon(grafo, "D") = 2
+Fin
